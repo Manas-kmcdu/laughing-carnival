@@ -1,0 +1,908 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>The Unrest GTA Challenge</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bowlby+One&family=Bricolage+Grotesque:wght@400;600;700&family=DM+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one neon-dusk poster. Sunset hero with live countdown, quiet animated poll tiles, a Loading soon mission board. */
+:root {
+  --ink: #170a30;
+  --ink-2: #1f0d3d;
+  --bld: #0e0422;
+  --pink: #ff3d8b;
+  --orange: #ff8a3d;
+  --sun: #ffd23f;
+  --teal: #2de2d0;
+  --cream: #fff0e3;
+  --muted: #c9b8ea;
+  --line: rgba(255, 240, 227, 0.12);
+  --tile: rgba(255, 240, 227, 0.045);
+  --font-display: 'Bowlby One', 'Arial Black', Impact, sans-serif;
+  --font-body: 'Bricolage Grotesque', 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: 'DM Mono', ui-monospace, Menlo, Consolas, monospace;
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --sunsize: clamp(240px, 36vw, 400px);
+  --floor: 72px;
+  --h2: clamp(2rem, 5.2vw, 3.3rem);
+  color-scheme: dark;
+}
+*, *::before, *::after { box-sizing: border-box; font-style: normal; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--ink);
+  color: var(--cream);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.55;
+}
+.wrap {
+  max-width: 1120px;
+  margin-inline: auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+a { color: inherit; }
+:focus-visible { outline: 3px solid var(--teal); outline-offset: 3px; }
+.mono {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+/* Hero */
+.hero {
+  background: linear-gradient(180deg, var(--ink) 0%, #3a1471 52%, #a81f64 84%, var(--orange) 100%);
+  overflow: hidden;
+}
+.topbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+  justify-content: space-between;
+  align-items: center;
+  padding-block: 20px 0;
+}
+.brand { font-family: var(--font-display); font-size: 1.4rem; letter-spacing: 0.04em; }
+.topbar .mono { color: var(--muted); }
+.top-right { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; }
+.sound {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--cream);
+  background: rgba(23, 10, 48, 0.5);
+  border: 1px solid var(--line);
+  border-radius: 0;
+  padding: 6px 14px;
+  cursor: pointer;
+}
+.sound[aria-pressed="true"] { background: var(--pink); border-color: var(--pink); color: var(--ink); }
+.hero-copy { padding-block: clamp(40px, 8vw, 88px) clamp(24px, 5vw, 48px); }
+h1 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(2.6rem, 8.6vw, 6.2rem);
+  line-height: 0.92;
+  margin: 0;
+  color: var(--sun);
+  text-shadow: 0.05em 0.05em 0 var(--pink);
+  text-wrap: balance;
+}
+.sub { font-family: var(--font-display); font-size: clamp(1.3rem, 3.4vw, 2rem); letter-spacing: 0.04em; margin: 18px 0 0; color: var(--cream); }
+.countdown { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 26px; }
+.start-cd { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.start-cd > .mono { margin: 0; color: var(--muted); }
+.sc-cards { display: flex; gap: 8px; }
+.sc {
+  width: 52px;
+  height: max(var(--h2), 50px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  background: var(--ink);
+  border: 2px solid var(--cream);
+  border-radius: 0;
+}
+.sc b {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 1.2rem;
+  line-height: 1;
+  color: var(--cream);
+  font-variant-numeric: tabular-nums;
+}
+.sc .mono { font-size: 0.56rem; letter-spacing: 0.1em; line-height: 1; color: var(--muted); }
+.cd {
+  background: rgba(23, 10, 48, 0.78);
+  border: 2px solid var(--cream);
+  border-radius: 0;
+  min-width: 76px;
+  padding: 10px 14px 8px;
+  text-align: center;
+}
+.cd b {
+  display: block;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(1.9rem, 6vw, 3rem);
+  line-height: 1.05;
+  font-variant-numeric: tabular-nums;
+}
+.cd span { color: var(--muted); }
+.cd-note { margin: 12px 0 0; color: var(--cream); }
+.cta-row { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 26px; }
+.btn {
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 1rem;
+  text-decoration: none;
+  display: inline-block;
+  padding: 13px 22px;
+  border: 2px solid var(--cream);
+  border-radius: 0;
+  background: transparent;
+  color: var(--cream);
+  cursor: pointer;
+  box-shadow: 4px 4px 0 var(--ink);
+  transition: transform 0.12s, box-shadow 0.12s;
+}
+.btn:hover { transform: translate(2px, 2px); box-shadow: 2px 2px 0 var(--ink); }
+.btn.primary { background: var(--pink); color: var(--ink); border-color: var(--ink); box-shadow: 4px 4px 0 var(--cream); }
+.btn.primary:hover { box-shadow: 2px 2px 0 var(--cream); }
+.btn.alt { background: var(--teal); color: var(--ink); border-color: var(--ink); box-shadow: 4px 4px 0 var(--cream); }
+.btn.alt:hover { box-shadow: 2px 2px 0 var(--cream); }
+.hero-helper { margin: 16px 0 0; max-width: 34rem; font-size: clamp(1.05rem, 2.4vw, 1.3rem); color: var(--cream); }
+
+/* Scene */
+.scene { position: relative; height: calc(var(--floor) + var(--sunsize) * 0.7 + 8px); }
+.sun {
+  position: absolute;
+  left: 50%;
+  bottom: calc(var(--floor) - var(--sunsize) * 0.3);
+  width: var(--sunsize);
+  aspect-ratio: 1;
+  max-width: 100%;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: linear-gradient(180deg, var(--sun) 10%, var(--orange) 55%, var(--pink) 100%);
+  -webkit-mask-image: linear-gradient(180deg, #000 0 44%, transparent 44% 47%, #000 47% 53%, transparent 53% 57%, #000 57% 62%, transparent 62% 66%, #000 66% 100%);
+  mask-image: linear-gradient(180deg, #000 0 44%, transparent 44% 47%, #000 47% 53%, transparent 53% 57%, #000 57% 62%, transparent 62% 66%, #000 66% 100%);
+}
+.sky {
+  position: absolute;
+  left: 0;
+  bottom: var(--floor);
+  width: 100%;
+  height: clamp(70px, 14vw, 120px);
+  display: block;
+}
+.sky .b { fill: var(--bld); }
+.sky .w1 { fill: var(--pink); }
+.sky .w2 { fill: var(--teal); }
+.floor {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: var(--floor);
+  background: var(--bld);
+  overflow: hidden;
+  perspective: 240px;
+}
+.floor::before {
+  content: "";
+  position: absolute;
+  left: -50%;
+  right: -50%;
+  top: 0;
+  bottom: -120%;
+  background:
+    repeating-linear-gradient(90deg, rgba(255, 61, 139, 0.7) 0 2px, transparent 2px 64px),
+    repeating-linear-gradient(0deg, rgba(255, 61, 139, 0.7) 0 2px, transparent 2px 36px);
+  transform: rotateX(62deg);
+  transform-origin: 50% 0;
+  animation: roll 1.6s linear infinite;
+}
+@keyframes roll {
+  from { background-position: 0 0, 0 0; }
+  to { background-position: 0 0, 0 36px; }
+}
+
+/* Sections */
+section { padding-block: clamp(44px, 8vw, 88px); }
+.sec-head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 12px 24px; margin-bottom: 28px; }
+h2 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: var(--h2);
+  line-height: 1;
+  margin: 0;
+  text-wrap: balance;
+}
+.status { color: var(--muted); margin: 0; min-height: 1.2em; }
+.helper { margin: -8px 0 28px; max-width: 36rem; font-size: clamp(1.05rem, 2.2vw, 1.25rem); }
+
+/* Poll tiles */
+.polls { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.tile {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 26px 22px 22px;
+  background: var(--tile);
+  border: 1px solid var(--line);
+  border-radius: 0;
+  transition: background 0.4s var(--ease), border-color 0.4s var(--ease), transform 0.4s var(--ease);
+  animation: rise 0.8s var(--ease) both;
+  animation-delay: calc(var(--i, 0) * 90ms);
+}
+.tile:hover { background: rgba(255, 240, 227, 0.07); border-color: rgba(255, 240, 227, 0.24); transform: translateY(-3px); }
+.tile.wide { grid-column: 1 / -1; }
+@keyframes rise {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: none; }
+}
+.tile-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding-inline: 12px; }
+.tile h3 { font-family: var(--font-body); font-weight: 600; font-size: 1.15rem; line-height: 1.25; margin: 0; text-wrap: balance; }
+.sample-chip { flex: none; color: var(--muted); border: 1px dashed var(--muted); border-radius: 0; padding: 2px 10px; }
+.opts { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.opt {
+  display: block;
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  color: var(--cream);
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  padding: 10px 12px;
+  cursor: pointer;
+  transition: background 0.3s var(--ease);
+}
+.opt:hover:not(:disabled) { background: rgba(255, 240, 227, 0.06); }
+.opt:disabled { cursor: default; color: var(--cream); }
+.opt.mine { background: rgba(255, 61, 139, 0.12); }
+.opt.pop { animation: press 0.5s var(--ease); }
+@keyframes press {
+  0% { transform: scale(0.97); }
+  60% { transform: scale(1.01); }
+  100% { transform: none; }
+}
+.opt-row { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 8px; }
+.o-name { min-width: 0; overflow-wrap: anywhere; }
+.opt.mine .o-name::after {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin-left: 9px;
+  border-radius: 50%;
+  background: var(--pink);
+  vertical-align: middle;
+  animation: dot 2.4s ease-in-out infinite;
+}
+@keyframes dot {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255, 61, 139, 0.55); }
+  50% { box-shadow: 0 0 0 6px rgba(255, 61, 139, 0); }
+}
+.o-pct { font-family: var(--font-mono); font-size: 0.8rem; font-variant-numeric: tabular-nums; color: var(--muted); transition: color 0.4s; }
+.opt.lead .o-pct { color: var(--pink); }
+.track { display: block; height: 3px; border-radius: 0; background: rgba(255, 240, 227, 0.1); overflow: hidden; }
+.fill {
+  display: block;
+  height: 100%;
+  width: 100%;
+  border-radius: 0;
+  background: rgba(255, 240, 227, 0.5);
+  transform-origin: left center;
+  transform: scaleX(var(--p, 0));
+  transition: transform 1s var(--ease), background 0.4s;
+}
+.opt.lead .fill { background: var(--pink); }
+.tile-foot { margin: auto 0 0; padding-inline: 12px; color: var(--muted); min-height: 1.2em; }
+
+/* Memory wall */
+.mem-form { display: flex; flex-wrap: wrap; gap: 10px; padding-inline: 12px; }
+.mem-form input {
+  flex: 1 1 240px;
+  min-width: 0;
+  font: inherit;
+  font-size: 1rem;
+  color: var(--cream);
+  background: rgba(255, 240, 227, 0.06);
+  border: 1px solid var(--line);
+  border-radius: 0;
+  padding: 11px 18px;
+}
+.mem-form input::placeholder { color: var(--muted); }
+.btn-sm {
+  font: inherit;
+  font-weight: 700;
+  color: var(--ink);
+  background: var(--pink);
+  border: 0;
+  border-radius: 0;
+  padding: 11px 24px;
+  cursor: pointer;
+  transition: transform 0.3s var(--ease);
+}
+.btn-sm:hover { transform: scale(1.04); }
+.mem-grid { list-style: none; margin: 0; padding: 0 12px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.note {
+  min-width: 0;
+  min-height: 112px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 18px;
+  background: rgba(255, 240, 227, 0.05);
+  border: 1px solid var(--line);
+  border-radius: 0;
+  transition: opacity 0.42s var(--ease), transform 0.42s var(--ease);
+}
+.note.out { opacity: 0; transform: translateY(8px); }
+.note p { margin: 0; overflow-wrap: anywhere; }
+.note small { color: var(--muted); }
+@media (max-width: 640px) {
+  .mem-grid { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* Missions */
+.missions-band { background: var(--ink-2); border-block: 1px solid var(--line); }
+.soon-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 22px;
+  padding: 8px 16px;
+  border: 1px solid var(--line);
+  border-radius: 0;
+  color: var(--cream);
+}
+.soon-pill i { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); }
+.skeletons { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 16px; }
+.sk { display: flex; flex-direction: column; gap: 12px; padding: 22px; border: 1px solid var(--line); border-radius: 0; background: var(--tile); }
+.bar {
+  display: block;
+  height: 10px;
+  border-radius: 0;
+  background: rgba(255, 240, 227, 0.09);
+}
+.bar.tall { height: 18px; }
+.bar.foot { margin-top: 12px; height: 14px; }
+.w30 { width: 30%; } .w40 { width: 40%; } .w60 { width: 60%; } .w70 { width: 70%; } .w90 { width: 90%; }
+.filters { display: flex; flex-wrap: wrap; gap: 10px; margin: 0 0 22px; }
+.chip {
+  font: inherit;
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 9px 16px;
+  color: var(--cream);
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 0;
+  cursor: pointer;
+}
+.chip[aria-pressed="true"] { background: var(--pink); border-color: var(--pink); color: var(--ink); }
+.missions { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); gap: 16px; }
+.mission { position: relative; min-width: 0; display: flex; flex-direction: column; gap: 12px; padding: 22px; background: var(--tile); border: 1px solid var(--line); border-radius: 0; }
+.mission.live { border-color: var(--pink); }
+.mission.done { border-color: var(--teal); }
+.m-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.m-top .mono { color: var(--muted); }
+.pill { padding: 3px 9px; border: 1px solid var(--muted); border-radius: 0; color: var(--muted); }
+.live .pill { background: var(--pink); border-color: var(--pink); color: var(--ink); }
+.mission h3 { font-family: var(--font-display); font-weight: 400; font-size: 1.35rem; line-height: 1.1; margin: 0; }
+.tag { align-self: flex-start; color: var(--teal); border: 1px solid var(--teal); border-radius: 0; padding: 2px 10px; margin: -4px 0 0; }
+.mission p { margin: 0; flex: 1; }
+.m-foot { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding-top: 12px; border-top: 1px dashed var(--line); }
+.pts { color: var(--sun); }
+.clear {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 8px 12px;
+  color: var(--cream);
+  background: transparent;
+  border: 1px solid var(--cream);
+  border-radius: 0;
+  cursor: pointer;
+}
+.clear[aria-pressed="true"] { background: var(--teal); border-color: var(--teal); color: var(--ink); }
+.clear:disabled { opacity: 0.4; cursor: not-allowed; }
+
+footer { padding-block: 36px 56px; border-top: 1px solid var(--line); color: var(--muted); }
+footer p { margin: 0 0 8px; max-width: 46rem; }
+
+@media (max-width: 900px) {
+  .polls { grid-template-columns: minmax(0, 1fr); }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .floor::before, .tile, .bar, .soon-pill i, .opt.mine .o-name::after, .opt.pop { animation: none; }
+  .fill, .tile, .btn, .btn-sm, .opt, .note { transition: none; }
+}
+</style>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="topbar">
+      <span class="brand">UNREST</span>
+      <div class="top-right"><span class="mono">Verified DU students only</span><button type="button" class="sound" id="sound" aria-pressed="false" hidden>Sound off</button></div>
+    </div>
+    <div class="hero-copy">
+      <h1>The Unrest GTA Challenge</h1>
+      <p class="sub">9 Days Out</p>
+      <p class="hero-helper">Complete missions across North, South and Off Campus and get rewards</p>
+      <div class="countdown" role="timer" aria-label="Time until launch on 19 November">
+        <div class="cd"><b id="cd-d">00</b><span class="mono">Days</span></div>
+        <div class="cd"><b id="cd-h">00</b><span class="mono">Hrs</span></div>
+        <div class="cd"><b id="cd-m">00</b><span class="mono">Min</span></div>
+        <div class="cd"><b id="cd-s">00</b><span class="mono">Sec</span></div>
+      </div>
+      <p class="mono cd-note" id="cd-note">Until launch, 19 Nov</p>
+      <div class="cta-row">
+        <a class="btn alt" href="#missions">See the missions</a>
+        <a class="btn primary" id="download" href="https://unrestdu.in/get" target="_blank" rel="noopener noreferrer">Download Unrest</a>
+      </div>
+    </div>
+  </div>
+  <div class="scene" aria-hidden="true">
+    <div class="sun"></div>
+    <svg class="sky" id="sky" viewBox="0 0 1200 120" preserveAspectRatio="xMidYMax slice" focusable="false"></svg>
+    <div class="floor"></div>
+  </div>
+</header>
+
+<main>
+  <section id="polls">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2>Polls</h2>
+        <p class="mono status" id="poll-status" aria-live="polite"></p>
+      </div>
+      <div class="polls" id="poll-grid">
+        <article class="tile wide" style="--i:3" id="memory-tile">
+          <div class="tile-top">
+            <h3>Your favourite GTA memory</h3>
+            <span class="mono sample-chip" id="mem-sample" hidden>Sample data</span>
+          </div>
+          <form class="mem-form" id="memory-form" hidden>
+            <input id="memory-input" type="text" maxlength="140" placeholder="Share yours in one line" aria-label="Your favourite GTA memory" autocomplete="off">
+            <button class="btn-sm" id="memory-post" type="submit">Post</button>
+          </form>
+          <ul class="mem-grid" id="mem-grid"></ul>
+          <p class="mono tile-foot" id="mem-foot"></p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section id="missions" class="missions-band">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2>Missions</h2>
+        <p class="mono status" id="run" hidden></p>
+        <div class="start-cd" role="timer" aria-label="Time until the challenge starts on 12 November">
+          <p class="mono" id="sc-label">Starts 12 Nov</p>
+          <div class="sc-cards">
+            <div class="sc"><b id="sc-d">00</b><span class="mono">Days</span></div>
+            <div class="sc"><b id="sc-h">00</b><span class="mono">Hrs</span></div>
+            <div class="sc"><b id="sc-m">00</b><span class="mono">Min</span></div>
+            <div class="sc"><b id="sc-s">00</b><span class="mono">Sec</span></div>
+          </div>
+        </div>
+      </div>
+      <p class="helper">Complete missions across North, South and Off Campus and get rewards from Unrest</p>
+      <div id="soon">
+        <p class="soon-pill mono" role="status"><i></i>Loading soon</p>
+        <ul class="skeletons" aria-hidden="true">
+          <li class="sk"><span class="bar w40"></span><span class="bar w70 tall"></span><span class="bar w90"></span><span class="bar w60"></span><span class="bar w30 foot"></span></li>
+          <li class="sk"><span class="bar w40"></span><span class="bar w70 tall"></span><span class="bar w90"></span><span class="bar w60"></span><span class="bar w30 foot"></span></li>
+          <li class="sk"><span class="bar w40"></span><span class="bar w70 tall"></span><span class="bar w90"></span><span class="bar w60"></span><span class="bar w30 foot"></span></li>
+          <li class="sk"><span class="bar w40"></span><span class="bar w70 tall"></span><span class="bar w90"></span><span class="bar w60"></span><span class="bar w30 foot"></span></li>
+          <li class="sk"><span class="bar w40"></span><span class="bar w70 tall"></span><span class="bar w90"></span><span class="bar w60"></span><span class="bar w30 foot"></span></li>
+          <li class="sk"><span class="bar w40"></span><span class="bar w70 tall"></span><span class="bar w90"></span><span class="bar w60"></span><span class="bar w30 foot"></span></li>
+        </ul>
+      </div>
+      <div id="live" hidden>
+        <div class="filters" id="filters" role="group" aria-label="Filter missions">
+          <button type="button" class="chip" id="f-all" data-f="all" aria-pressed="true">All missions</button>
+          <button type="button" class="chip" id="f-gta" data-f="gta" aria-pressed="false">GTA enthusiast</button>
+          <button type="button" class="chip" id="f-std" data-f="std" aria-pressed="false">No tag</button>
+        </div>
+        <ol class="missions" id="mission-list"></ol>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>The Unrest GTA Challenge is a fan-made campus event, open to verified students only.</p>
+    <p>Not affiliated with or endorsed by Rockstar Games or Take-Two Interactive.</p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var REDUCED = false;
+  try { REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
+  function $(id) { return document.getElementById(id); }
+  function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+  function pad(n) { return (n < 10 ? '0' : '') + n; }
+  function sum(a, b) { return a + b; }
+
+  /* Flip to true when missions go live. The board below is ready. */
+  var MISSIONS_LIVE = false;
+
+  var GAMES = ['GTA III', 'Vice City', 'San Andreas', 'GTA IV', 'GTA V', 'Something else'];
+  /* sample holds placeholder counts shown (with a Sample data badge) until real answers exist. */
+  var POLLS = [
+    { key: 'best', title: 'Best GTA game so far', opts: GAMES, sample: [14, 48, 117, 31, 62, 8] },
+    { key: 'fav', title: 'Your favourite GTA game', opts: GAMES, sample: [9, 71, 96, 22, 84, 5] },
+    { key: 'age', title: 'How old were you when you started playing?', opts: ['Under 10', '10 to 12', '13 to 15', '16 to 18', '19 or older', 'Haven’t played yet'], sample: [38, 121, 96, 41, 12, 23] }
+  ];
+  var SAMPLE_MEMORIES = [
+    'Spent a whole summer holiday just driving around with the radio on.',
+    'Four cousins, one TV, and the controller changing hands after every crash.',
+    'Finally clearing a mission after failing it fifty times.',
+    'Typing my first cheat code and feeling like I had hacked the world.',
+    'Playing at a friend’s place because my parents said no.',
+    'Realising you could keep exploring long after the story ended.',
+    'Hiding from the in-game police at the top of a building for an hour.',
+    'Ranking every radio station with my brother and never agreeing.',
+    'The first time I discovered the map was much bigger than I thought.'
+  ];
+
+  /* ---------- Countdown to 19 Nov 2026, 00:00 IST ---------- */
+  var target = Date.parse('2026-11-19T00:00:00+05:30');
+  function tick() {
+    var s = Math.floor(Math.max(0, target - Date.now()) / 1000);
+    $('cd-d').textContent = pad(Math.floor(s / 86400));
+    $('cd-h').textContent = pad(Math.floor(s % 86400 / 3600));
+    $('cd-m').textContent = pad(Math.floor(s % 3600 / 60));
+    $('cd-s').textContent = pad(s % 60);
+    if (s === 0) $('cd-note').textContent = 'Launch day is here';
+  }
+  tick();
+  setInterval(tick, 1000);
+
+  /* Challenge countdown: starts 12 Nov 2026, 00:00 IST */
+  var startAt = Date.parse('2026-11-12T00:00:00+05:30');
+  function startTick() {
+    var s = Math.floor(Math.max(0, startAt - Date.now()) / 1000);
+    $('sc-d').textContent = pad(Math.floor(s / 86400));
+    $('sc-h').textContent = pad(Math.floor(s % 86400 / 3600));
+    $('sc-m').textContent = pad(Math.floor(s % 3600 / 60));
+    $('sc-s').textContent = pad(s % 60);
+    if (s === 0) $('sc-label').textContent = 'Challenge is live';
+  }
+  startTick();
+  setInterval(startTick, 1000);
+
+  /* ---------- Skyline, drawn once from a fixed seed ---------- */
+  (function skyline() {
+    var svg = $('sky');
+    var NS = 'http://www.w3.org/2000/svg';
+    var seed = 7;
+    function rnd() { seed = (seed * 16807) % 2147483647; return seed / 2147483647; }
+    var x = 0;
+    while (x < 1200) {
+      var w = 24 + Math.floor(rnd() * 40);
+      var h = 34 + Math.floor(rnd() * 80);
+      var r = document.createElementNS(NS, 'rect');
+      r.setAttribute('class', 'b');
+      r.setAttribute('x', x); r.setAttribute('y', 120 - h);
+      r.setAttribute('width', w); r.setAttribute('height', h);
+      svg.appendChild(r);
+      var lights = Math.floor(rnd() * 4);
+      for (var i = 0; i < lights; i++) {
+        var win = document.createElementNS(NS, 'rect');
+        win.setAttribute('class', rnd() > 0.5 ? 'w1' : 'w2');
+        win.setAttribute('x', x + 4 + Math.floor(rnd() * Math.max(1, w - 12)));
+        win.setAttribute('y', 120 - h + 8 + Math.floor(rnd() * Math.max(1, h - 20)));
+        win.setAttribute('width', 4); win.setAttribute('height', 4);
+        svg.appendChild(win);
+      }
+      x += w + 2 + Math.floor(rnd() * 6);
+    }
+  })();
+
+  /* ---------- Poll tiles ---------- */
+  var grid = $('poll-grid');
+  var db = null, uid = null, canWrite = false, loaded = false, msg = '';
+  var votes = {};
+
+  grid.insertAdjacentHTML('afterbegin', POLLS.map(function (p, pi) {
+    return '<article class="tile" style="--i:' + pi + '" data-key="' + p.key + '">' +
+      '<div class="tile-top"><h3>' + esc(p.title) + '</h3><span class="mono sample-chip" data-sample hidden>Sample data</span></div>' +
+      '<ul class="opts">' + p.opts.map(function (o, oi) {
+        return '<li><button type="button" class="opt" id="opt-' + p.key + '-' + oi + '" data-key="' + p.key + '" data-o="' + oi + '" aria-pressed="false" disabled>' +
+          '<span class="opt-row"><span class="o-name">' + esc(o) + '</span><span class="o-pct" data-pct>0%</span></span>' +
+          '<span class="track" aria-hidden="true"><span class="fill"></span></span></button></li>';
+      }).join('') + '</ul><p class="mono tile-foot" data-total></p></article>';
+  }).join(''));
+  void grid.offsetWidth;
+
+  function tween(el, to) {
+    var from = el._v == null ? 0 : el._v;
+    el._v = to;
+    var id = el._tk = (el._tk || 0) + 1;
+    if (REDUCED || from === to) { el.textContent = to + '%'; return; }
+    var t0 = null;
+    function f(t) {
+      if (el._tk !== id) return;
+      if (t0 === null) t0 = t;
+      var k = Math.min(1, (t - t0) / 900);
+      var e = 1 - Math.pow(1 - k, 3);
+      el.textContent = Math.round(from + (to - from) * e) + '%';
+      if (k < 1) requestAnimationFrame(f);
+    }
+    requestAnimationFrame(f);
+  }
+
+  function counts(p) {
+    var c = p.opts.map(function () { return 0; });
+    Object.keys(votes).forEach(function (id) {
+      var d = votes[id];
+      var i = d ? p.opts.indexOf(d[p.key]) : -1;
+      if (i > -1) c[i]++;
+    });
+    return c;
+  }
+
+  function memories() {
+    var list = [];
+    Object.keys(votes).forEach(function (id) {
+      var d = votes[id];
+      if (d && typeof d.memory === 'string' && d.memory.trim()) list.push({ t: d.memory.trim().slice(0, 140), ts: Number(d.ts) || 0, me: id === uid });
+    });
+    list.sort(function (a, b) { return b.ts - a.ts; });
+    return list.slice(0, 60);
+  }
+
+  /* Memory wall: a static 3x3 grid. With more than 9 memories it swaps to the next 9 every 8 seconds. */
+  var memSig = '', memList = [], memStart = 0, memTok = 0, memTimer = null;
+  var memGrid = $('mem-grid');
+  memGrid.innerHTML = new Array(10).join('<li class="note" hidden><p></p><small class="mono"></small></li>');
+
+  function fillCell(li, item) {
+    li.querySelector('p').textContent = item.t;
+    li.querySelector('small').textContent = item.me ? 'You' : 'Anonymous';
+  }
+  function showWindow(animated) {
+    var n = memList.length;
+    var tok = ++memTok;
+    var cells = memGrid.children;
+    for (var i = 0; i < 9; i++) {
+      (function (li, i) {
+        var item = i < n ? memList[(memStart + i) % n] : null;
+        if (!item) { li.hidden = true; return; }
+        if (!animated || li.hidden) { li.classList.remove('out'); fillCell(li, item); li.hidden = false; return; }
+        setTimeout(function () {
+          if (tok !== memTok) return;
+          li.classList.add('out');
+          setTimeout(function () {
+            if (tok !== memTok) return;
+            fillCell(li, item);
+            li.classList.remove('out');
+          }, REDUCED ? 0 : 420);
+        }, REDUCED ? 0 : i * 70);
+      })(cells[i], i);
+    }
+  }
+  function renderMemories() {
+    var list = memories();
+    var sample = list.length === 0;
+    if (sample) list = SAMPLE_MEMORIES.map(function (t) { return { t: t, me: false }; });
+    $('mem-sample').hidden = !sample;
+    $('mem-foot').textContent = sample ? '' : list.length + (list.length === 1 ? ' memory' : ' memories');
+    var sig = (sample ? 's' : 'r') + JSON.stringify(list);
+    if (sig === memSig) return;
+    memSig = sig;
+    memList = list;
+    memStart = 0;
+    showWindow(false);
+    if (list.length > 9) {
+      if (!memTimer) {
+        memTimer = setInterval(function () {
+          if (document.hidden || memList.length <= 9 || memGrid.matches(':hover')) return;
+          memStart = (memStart + 9) % memList.length;
+          showWindow(true);
+        }, 8000);
+      }
+    } else if (memTimer) {
+      clearInterval(memTimer);
+      memTimer = null;
+    }
+  }
+
+  function update() {
+    var mine = (uid && votes[uid]) || {};
+    POLLS.forEach(function (p) {
+      var c = counts(p);
+      var sample = c.reduce(sum, 0) === 0;
+      if (sample) c = p.sample.slice();
+      var total = c.reduce(sum, 0);
+      var top = Math.max.apply(null, c);
+      var tile = grid.querySelector('.tile[data-key="' + p.key + '"]');
+      tile.querySelector('[data-sample]').hidden = !sample;
+      tile.querySelector('[data-total]').textContent = sample ? '' : total + (total === 1 ? ' answer' : ' answers');
+      var btns = tile.querySelectorAll('.opt');
+      for (var i = 0; i < btns.length; i++) {
+        var pct = total ? Math.round(c[i] / total * 100) : 0;
+        var isMine = mine[p.key] === p.opts[i];
+        btns[i].querySelector('.fill').style.setProperty('--p', String(pct / 100));
+        tween(btns[i].querySelector('[data-pct]'), pct);
+        btns[i].classList.toggle('lead', c[i] === top && top > 0);
+        btns[i].classList.toggle('mine', isMine);
+        btns[i].setAttribute('aria-pressed', isMine ? 'true' : 'false');
+        btns[i].disabled = !canWrite;
+      }
+    });
+    renderMemories();
+    $('memory-form').hidden = !canWrite;
+    $('poll-status').textContent = msg || (canWrite ? '' : 'Voting opens soon');
+  }
+  update();
+
+  /* ---------- Storage ---------- */
+  var chain = Promise.resolve();
+  function saveMine(patch) {
+    if (!db || !uid || !canWrite) return;
+    var next = Object.assign({}, votes[uid] || {}, patch, { ts: Date.now() });
+    votes[uid] = next;
+    msg = '';
+    update();
+    chain = chain.then(function () { return db.doc('votes/' + uid).set(next); })
+      .catch(function () { canWrite = false; msg = 'Could not save your answer'; update(); });
+  }
+
+  grid.addEventListener('click', function (e) {
+    var b = e.target.closest ? e.target.closest('.opt') : null;
+    if (!b || b.disabled) return;
+    var p = POLLS.filter(function (x) { return x.key === b.getAttribute('data-key'); })[0];
+    var patch = {};
+    patch[p.key] = p.opts[Number(b.getAttribute('data-o'))];
+    b.classList.remove('pop');
+    void b.offsetWidth;
+    b.classList.add('pop');
+    saveMine(patch);
+  });
+  $('memory-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var input = $('memory-input');
+    var text = input.value.trim().slice(0, 140);
+    if (text.length < 3) return;
+    saveMine({ memory: text });
+    input.value = '';
+  });
+
+  async function initStore(tries) {
+    var c = window.claude;
+    if (!c || !c.use) { if (tries < 4) setTimeout(function () { initStore(tries + 1); }, 600); return; }
+    try {
+      var got = await Promise.all([c.use('db'), c.use('user')]);
+      db = got[0];
+      var user = got[1];
+      if (!db) return;
+      uid = user ? await user.id() : null;
+      var cw = user ? await user.can('data.write') : null;
+      canWrite = !!uid && cw !== false;
+      var timer = setTimeout(function () { if (!loaded) { msg = 'Results may be out of date'; update(); } }, 10000);
+      db.collection('votes').onSnapshot(function (snap) {
+        var next = {};
+        snap.docs.forEach(function (d) { next[d.id] = d.data(); });
+        votes = next;
+        if (!snap.metadata.fromCache) { loaded = true; clearTimeout(timer); if (msg === 'Results may be out of date') msg = ''; }
+        update();
+      }, function () { msg = 'Live results unavailable'; update(); });
+      update();
+    } catch (err) {}
+  }
+  initStore(0);
+
+  /* ---------- Missions ---------- */
+  var MISSIONS = [
+    { id: 'm01', d: '2026-11-10', name: 'Waiting Face', text: 'Post your best waiting face while the preload bar crawls.', pts: 100 },
+    { id: 'm02', d: '2026-11-10', gta: true, name: 'Preload Flex', text: 'Post your preload progress from console or PC. Bonus points for a full bar.', pts: 100 },
+    { id: 'm03', d: '2026-11-11', name: 'Meme Heist', text: 'Make the best meme about your college and the launch. Students vote and the top meme takes the day.', pts: 150 },
+    { id: 'm04', d: '2026-11-11', gta: true, name: 'Call It', text: 'Lock in your prediction for the launch Metacritic score. The closest call earns bonus points.', pts: 150 },
+    { id: 'm05', d: '2026-11-12', name: 'Bunk Poll', text: 'Vote on which college goes missing on the 20th. Results show by college, never by name.', pts: 100 },
+    { id: 'm06', d: '2026-11-13', name: 'Radio Static', text: 'Build a five song station for a night drive. The best playlist takes the points.', pts: 100 },
+    { id: 'm07', d: '2026-11-13', gta: true, name: 'Map Memory', text: 'Sketch your favourite city from the series, from memory. The most recognisable sketch wins.', pts: 150 },
+    { id: 'm08', d: '2026-11-14', name: 'Bring Five', text: 'Bring five verified friends onto Unrest. This is the biggest score of the week.', pts: 300 },
+    { id: 'm09', d: '2026-11-15', name: 'College Colours', text: 'Post a group photo in your college colours. The biggest group in frame scores highest.', pts: 200 },
+    { id: 'm10', d: '2026-11-15', gta: true, name: 'Speedrun Dare', text: 'Clip your fastest mission clear from any game in the series. The quickest clean run wins.', pts: 200 },
+    { id: 'm11', d: '2026-11-16', name: 'The Alibi', text: 'Pitch your best excuse for a free morning on the 20th. The funniest believable entry wins.', pts: 100 },
+    { id: 'm12', d: '2026-11-16', gta: true, name: 'Trivia Night', text: 'Ten questions on the series, from the first game to now. The fastest accurate score wins.', pts: 150 },
+    { id: 'm13', d: '2026-11-17', name: 'Rival Roast', text: 'Roast a rival college, kindly. Students vote and the cleanest burn takes the day.', pts: 150 },
+    { id: 'm14', d: '2026-11-18', name: 'Last Lap', text: 'Show how you are getting ready for the 19th, in any format you like.', pts: 150 },
+    { id: 'm15', d: '2026-11-18', gta: true, name: 'Tier List', text: 'Rank every game in the series with one line on why. The most debated list wins.', pts: 150 }
+  ];
+
+  if (MISSIONS_LIVE) {
+    var MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    var DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    MISSIONS.forEach(function (m) {
+      var dt = new Date(m.d + 'T12:00:00Z');
+      m.dayNo = Number(m.d.slice(8)) - 9;
+      m.short = dt.getUTCDate() + ' ' + MONTHS[dt.getUTCMonth()];
+      m.label = DAYS[dt.getUTCDay()] + ' ' + m.short;
+    });
+    var KEY_DONE = 'unrest-9do-cleared-v2';
+    var done = [];
+    try { done = JSON.parse(localStorage.getItem(KEY_DONE) || '[]'); } catch (e) {}
+    var today = new Date(Date.now() + 19800000).toISOString().slice(0, 10);
+    var filter = 'all';
+    var list = $('mission-list');
+    var renderMissions = function () {
+      var shown = MISSIONS.filter(function (m) { return filter === 'all' || (filter === 'gta' ? m.gta : !m.gta); });
+      list.innerHTML = shown.map(function (m) {
+        var st = m.d === today ? 'live' : (m.d < today ? 'closed' : 'soon');
+        var isDone = done.indexOf(m.id) !== -1;
+        var pill = st === 'live' ? 'Live now' : (st === 'closed' ? 'Closed' : 'Drops ' + m.short);
+        return '<li class="mission' + (st === 'live' ? ' live' : '') + (isDone ? ' done' : '') + '">' +
+          '<div class="m-top"><span class="mono">Day ' + m.dayNo + ' · ' + esc(m.label) + '</span><span class="mono pill">' + esc(pill) + '</span></div>' +
+          '<h3>' + esc(m.name) + '</h3>' + (m.gta ? '<span class="mono tag">GTA enthusiast</span>' : '') +
+          '<p>' + esc(m.text) + '</p>' +
+          '<div class="m-foot"><span class="mono pts">' + m.pts + ' pts</span>' +
+          '<button type="button" class="clear" id="clear-' + m.id + '" data-id="' + m.id + '" aria-pressed="' + isDone + '"' + (st === 'soon' ? ' disabled' : '') + '>' + (isDone ? 'Cleared' : 'Mark cleared') + '</button></div></li>';
+      }).join('');
+      $('run').textContent = 'Your run: ' + done.length + ' of ' + MISSIONS.length + ' cleared';
+    };
+    list.addEventListener('click', function (e) {
+      var b = e.target.closest ? e.target.closest('.clear') : null;
+      if (!b || b.disabled) return;
+      var id = b.getAttribute('data-id');
+      var at = done.indexOf(id);
+      if (at === -1) done.push(id); else done.splice(at, 1);
+      try { localStorage.setItem(KEY_DONE, JSON.stringify(done)); } catch (e2) {}
+      renderMissions();
+    });
+    $('filters').addEventListener('click', function (e) {
+      var b = e.target.closest ? e.target.closest('.chip') : null;
+      if (!b) return;
+      filter = b.getAttribute('data-f');
+      var all = this.querySelectorAll('.chip');
+      for (var i = 0; i < all.length; i++) all[i].setAttribute('aria-pressed', all[i] === b ? 'true' : 'false');
+      renderMissions();
+    });
+    $('soon').hidden = true;
+    $('live').hidden = false;
+    $('run').hidden = false;
+    renderMissions();
+  }
+
+  /* ---------- Music: put music.mp3 next to this page. The button stays hidden until the file loads. ---------- */
+  (function () {
+    var btn = $('sound');
+    var audio;
+    try { audio = new Audio(); audio.loop = true; audio.preload = 'metadata'; audio.volume = 0.6; } catch (e) { return; }
+    function set(on) { btn.textContent = on ? 'Sound on' : 'Sound off'; btn.setAttribute('aria-pressed', on ? 'true' : 'false'); }
+    audio.addEventListener('loadedmetadata', function () { btn.hidden = false; });
+    audio.addEventListener('error', function () { btn.hidden = true; });
+    audio.src = 'music.mp3';
+    btn.addEventListener('click', function () {
+      if (audio.paused) {
+        var p = audio.play();
+        if (p && p.catch) p.catch(function () { set(false); });
+        set(true);
+      } else {
+        audio.pause();
+        set(false);
+      }
+    });
+  })();
+
+})();
+</script>
+
+</body></html>
