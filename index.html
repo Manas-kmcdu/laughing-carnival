@@ -889,7 +889,7 @@ footer p { margin: 0 0 8px; max-width: 46rem; }
     function set(on) { btn.textContent = on ? 'Sound on' : 'Sound off'; btn.setAttribute('aria-pressed', on ? 'true' : 'false'); }
     audio.addEventListener('loadedmetadata', function () { btn.hidden = false; });
     audio.addEventListener('error', function () { btn.hidden = true; });
-    audio.src = 'music.mp3';
+    audio.src = 'gta.mp3';
     btn.addEventListener('click', function () {
       if (audio.paused) {
         var p = audio.play();
