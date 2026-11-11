@@ -539,6 +539,9 @@ footer p { margin: 0 0 8px; max-width: 46rem; }
   /* Flip to true when missions go live. The board below is ready. */
   var MISSIONS_LIVE = false;
 
+  /* PASTE YOUR APPS SCRIPT WEB APP /exec URL HERE */
+  var SCRIPT_URL = 'PASTE_EXEC_URL_HERE';
+
   var GAMES = ['GTA III', 'Vice City', 'San Andreas', 'GTA IV', 'GTA V', 'Something else'];
   var POLLS = [
     { key: 'best', title: 'Best GTA game so far', opts: GAMES },
@@ -732,16 +735,27 @@ footer p { margin: 0 0 8px; max-width: 46rem; }
   }
   update();
 
-  /* ---------- Storage ---------- */
+  /* ---------- Storage (Google Sheet via Apps Script) ---------- */
+  var urlOk = /^https:\/\/script\.google\.com\/.+\/exec/.test(SCRIPT_URL);
+  try {
+    uid = localStorage.getItem('unrest-gta-uid');
+    if (!uid) { uid = 'u' + Date.now().toString(36) + Math.random().toString(36).slice(2, 10); localStorage.setItem('unrest-gta-uid', uid); }
+  } catch (e) { uid = 'u' + Date.now().toString(36) + Math.random().toString(36).slice(2, 10); }
+  canWrite = urlOk;
+
   var chain = Promise.resolve();
   function saveMine(patch) {
-    if (!db || !uid || !canWrite) return;
+    if (!canWrite) return;
     var next = Object.assign({}, votes[uid] || {}, patch, { ts: Date.now() });
     votes[uid] = next;
     msg = '';
     update();
-    chain = chain.then(function () { return db.doc('votes/' + uid).set(next); })
-      .catch(function () { canWrite = false; msg = 'Could not save your answer'; update(); });
+    var body = Object.assign({ id: uid }, next);
+    chain = chain.then(function () {
+      return fetch(SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(body) })
+        .then(function (r) { return r.json(); })
+        .then(function (j) { if (!j || !j.ok) throw new Error('bad'); });
+    }).catch(function () { msg = 'Could not save your answer'; update(); });
   }
 
   grid.addEventListener('click', function (e) {
@@ -764,29 +778,27 @@ footer p { margin: 0 0 8px; max-width: 46rem; }
     input.value = '';
   });
 
-  async function initStore(tries) {
-    var c = window.claude;
-    if (!c || !c.use) { if (tries < 4) setTimeout(function () { initStore(tries + 1); }, 600); return; }
-    try {
-      var got = await Promise.all([c.use('db'), c.use('user')]);
-      db = got[0];
-      var user = got[1];
-      if (!db) return;
-      uid = user ? await user.id() : null;
-      var cw = user ? await user.can('data.write') : null;
-      canWrite = !!uid && cw !== false;
-      var timer = setTimeout(function () { if (!loaded) { msg = 'Results may be out of date'; update(); } }, 10000);
-      db.collection('votes').onSnapshot(function (snap) {
-        var next = {};
-        snap.docs.forEach(function (d) { next[d.id] = d.data(); });
+  function load() {
+    fetch(SCRIPT_URL + (SCRIPT_URL.indexOf('?') > -1 ? '&' : '?') + 'action=list&t=' + Date.now())
+      .then(function (r) { return r.json(); })
+      .then(function (j) {
+        var next = (j && j.votes) || {};
+        var mine = votes[uid];
+        if (mine && (!next[uid] || Number(mine.ts) > Number(next[uid].ts || 0))) next[uid] = mine;
         votes = next;
-        if (!snap.metadata.fromCache) { loaded = true; clearTimeout(timer); if (msg === 'Results may be out of date') msg = ''; }
+        loaded = true;
+        if (msg === 'Live results unavailable') msg = '';
         update();
-      }, function () { msg = 'Live results unavailable'; update(); });
-      update();
-    } catch (err) {}
+      })
+      .catch(function () { msg = 'Live results unavailable'; update(); });
   }
-  initStore(0);
+  if (urlOk) {
+    load();
+    setInterval(function () { if (!document.hidden) load(); }, 10000);
+  } else {
+    msg = 'Set SCRIPT_URL';
+    update();
+  }
 
   /* ---------- Missions ---------- */
   var MISSIONS = [
