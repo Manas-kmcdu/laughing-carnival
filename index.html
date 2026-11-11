@@ -1,9 +1,7 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <title>The Unrest GTA Challenge</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bowlby+One&family=Bricolage+Grotesque:wght@400;600;700&family=DM+Mono:wght@400;500&display=swap">
 <style>
-/* Layout: one neon-dusk poster. Sunset hero with live countdown, quiet animated poll tiles, a Loading soon mission board. */
 :root {
   --ink: #170a30;
   --ink-2: #1f0d3d;
@@ -248,7 +246,6 @@ h2 {
 }
 .tile-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding-inline: 12px; }
 .tile h3 { font-family: var(--font-body); font-weight: 600; font-size: 1.15rem; line-height: 1.25; margin: 0; text-wrap: balance; }
-.sample-chip { flex: none; color: var(--muted); border: 1px dashed var(--muted); border-radius: 0; padding: 2px 10px; }
 .opts { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
 .opt {
   display: block;
@@ -332,6 +329,7 @@ h2 {
 }
 .btn-sm:hover { transform: scale(1.04); }
 .mem-grid { list-style: none; margin: 0; padding: 0 12px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.mem-grid:empty { display: none; }
 .note {
   min-width: 0;
   min-height: 112px;
@@ -471,7 +469,6 @@ footer p { margin: 0 0 8px; max-width: 46rem; }
         <article class="tile wide" style="--i:3" id="memory-tile">
           <div class="tile-top">
             <h3>Your favourite GTA memory</h3>
-            <span class="mono sample-chip" id="mem-sample" hidden>Sample data</span>
           </div>
           <form class="mem-form" id="memory-form" hidden>
             <input id="memory-input" type="text" maxlength="140" placeholder="Share yours in one line" aria-label="Your favourite GTA memory" autocomplete="off">
@@ -543,22 +540,10 @@ footer p { margin: 0 0 8px; max-width: 46rem; }
   var MISSIONS_LIVE = false;
 
   var GAMES = ['GTA III', 'Vice City', 'San Andreas', 'GTA IV', 'GTA V', 'Something else'];
-  /* sample holds placeholder counts shown (with a Sample data badge) until real answers exist. */
   var POLLS = [
-    { key: 'best', title: 'Best GTA game so far', opts: GAMES, sample: [14, 48, 117, 31, 62, 8] },
-    { key: 'fav', title: 'Your favourite GTA game', opts: GAMES, sample: [9, 71, 96, 22, 84, 5] },
-    { key: 'age', title: 'How old were you when you started playing?', opts: ['Under 10', '10 to 12', '13 to 15', '16 to 18', '19 or older', 'Haven’t played yet'], sample: [38, 121, 96, 41, 12, 23] }
-  ];
-  var SAMPLE_MEMORIES = [
-    'Spent a whole summer holiday just driving around with the radio on.',
-    'Four cousins, one TV, and the controller changing hands after every crash.',
-    'Finally clearing a mission after failing it fifty times.',
-    'Typing my first cheat code and feeling like I had hacked the world.',
-    'Playing at a friend’s place because my parents said no.',
-    'Realising you could keep exploring long after the story ended.',
-    'Hiding from the in-game police at the top of a building for an hour.',
-    'Ranking every radio station with my brother and never agreeing.',
-    'The first time I discovered the map was much bigger than I thought.'
+    { key: 'best', title: 'Best GTA game so far', opts: GAMES },
+    { key: 'fav', title: 'Your favourite GTA game', opts: GAMES },
+    { key: 'age', title: 'How old were you when you started playing?', opts: ['Under 10', '10 to 12', '13 to 15', '16 to 18', '19 or older', 'Haven’t played yet'] }
   ];
 
   /* ---------- Countdown to 19 Nov 2026, 00:00 IST ---------- */
@@ -622,7 +607,7 @@ footer p { margin: 0 0 8px; max-width: 46rem; }
 
   grid.insertAdjacentHTML('afterbegin', POLLS.map(function (p, pi) {
     return '<article class="tile" style="--i:' + pi + '" data-key="' + p.key + '">' +
-      '<div class="tile-top"><h3>' + esc(p.title) + '</h3><span class="mono sample-chip" data-sample hidden>Sample data</span></div>' +
+      '<div class="tile-top"><h3>' + esc(p.title) + '</h3></div>' +
       '<ul class="opts">' + p.opts.map(function (o, oi) {
         return '<li><button type="button" class="opt" id="opt-' + p.key + '-' + oi + '" data-key="' + p.key + '" data-o="' + oi + '" aria-pressed="false" disabled>' +
           '<span class="opt-row"><span class="o-name">' + esc(o) + '</span><span class="o-pct" data-pct>0%</span></span>' +
@@ -668,7 +653,7 @@ footer p { margin: 0 0 8px; max-width: 46rem; }
     return list.slice(0, 60);
   }
 
-  /* Memory wall: a static 3x3 grid. With more than 9 memories it swaps to the next 9 every 8 seconds. */
+  /* Memory wall: real memories only, 3x3 window. With more than 9 it swaps to the next 9 every 8 seconds. */
   var memSig = '', memList = [], memStart = 0, memTok = 0, memTimer = null;
   var memGrid = $('mem-grid');
   memGrid.innerHTML = new Array(10).join('<li class="note" hidden><p></p><small class="mono"></small></li>');
@@ -700,11 +685,8 @@ footer p { margin: 0 0 8px; max-width: 46rem; }
   }
   function renderMemories() {
     var list = memories();
-    var sample = list.length === 0;
-    if (sample) list = SAMPLE_MEMORIES.map(function (t) { return { t: t, me: false }; });
-    $('mem-sample').hidden = !sample;
-    $('mem-foot').textContent = sample ? '' : list.length + (list.length === 1 ? ' memory' : ' memories');
-    var sig = (sample ? 's' : 'r') + JSON.stringify(list);
+    $('mem-foot').textContent = list.length ? list.length + (list.length === 1 ? ' memory' : ' memories') : '';
+    var sig = JSON.stringify(list);
     if (sig === memSig) return;
     memSig = sig;
     memList = list;
@@ -728,13 +710,10 @@ footer p { margin: 0 0 8px; max-width: 46rem; }
     var mine = (uid && votes[uid]) || {};
     POLLS.forEach(function (p) {
       var c = counts(p);
-      var sample = c.reduce(sum, 0) === 0;
-      if (sample) c = p.sample.slice();
       var total = c.reduce(sum, 0);
       var top = Math.max.apply(null, c);
       var tile = grid.querySelector('.tile[data-key="' + p.key + '"]');
-      tile.querySelector('[data-sample]').hidden = !sample;
-      tile.querySelector('[data-total]').textContent = sample ? '' : total + (total === 1 ? ' answer' : ' answers');
+      tile.querySelector('[data-total]').textContent = total ? total + (total === 1 ? ' answer' : ' answers') : '';
       var btns = tile.querySelectorAll('.opt');
       for (var i = 0; i < btns.length; i++) {
         var pct = total ? Math.round(c[i] / total * 100) : 0;
@@ -881,7 +860,7 @@ footer p { margin: 0 0 8px; max-width: 46rem; }
     renderMissions();
   }
 
-  /* ---------- Music: put music.mp3 next to this page. The button stays hidden until the file loads. ---------- */
+  /* ---------- Music: put gta.mp3 next to this page. The button stays hidden until the file loads. ---------- */
   (function () {
     var btn = $('sound');
     var audio;
@@ -904,5 +883,3 @@ footer p { margin: 0 0 8px; max-width: 46rem; }
 
 })();
 </script>
-
-</body></html>
